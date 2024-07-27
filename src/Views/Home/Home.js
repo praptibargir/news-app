@@ -5,21 +5,38 @@ import NewsArticle from '../../Components/NewsArticle/NewsArticle'
 
 function Home() {
     const [news, setNews] =useState([])
+    const [searchQuery, setSearchQuery] = useState("pune")
 
     const loadNews = async () => {
-        const response=await axios.get("https://newsapi.org/v2/everything?q=tesla&from=2024-06-27&sortBy=publishedAt&apiKey=6bbeaa9e30574d999a5df20b2ec7a7a9")
-        setNews(response.data.articles)
+        try{
+            const response=await axios.get(`https://newsapi.org/v2/everything?q=${searchQuery}&nature&from=2024-06-27&sortBy=publishedAt&apiKey=6bbeaa9e30574d999a5df20b2ec7a7a9`)
+            setNews(response.data.articles)
+        }
+        catch(error){
+            console.log(error);
+        }
     }
 
     useEffect(()=>{
         loadNews()
     },[])
+
+    useEffect(()=>{
+        loadNews();
+    },[searchQuery])
+
   return (
     <div>
-        <h1>News App</h1>
+        <h1 className='main-title'>News App</h1>
+        <input type='text'
+            value={searchQuery}
+            className='search-input'
+            onChange={(e) =>setSearchQuery(e.target.value)}
+        />
+        <div className='news-container'>
         {
             news.map((newsArticle,index)=>{
-                const {author,title,description,url,urlToImage,publishedAt,content}=newsArticle
+                const {author,title,description,url,urlToImage,publishedAt}=newsArticle
                 return(
                     <NewsArticle 
                     author={author} 
@@ -28,11 +45,11 @@ function Home() {
                     url={url} 
                     urlToImage={urlToImage} 
                     publishedAt={publishedAt} 
-                    content={content}
                     key={index}/>
                 )
             })
         }
+        </div>
     </div>
   )
 }
